@@ -98,9 +98,22 @@ function create_event(entity ,action ,station_id ,pump_id ,user_id ,adjustment){
         mm='0'+mm;
     } 
     
+    var hh = today.getHours();
+    if (hh < 10) hh = '0' + '' + hh;
+
+    var mm = today.getMinutes();
+    if (mm < 10) mm = '0' + '' + mm;
+
+    var ss = today.getSeconds();
+    if (ss < 10) ss = '0' + '' + ss;
+
+    var ms = today.getMilliseconds();
+    if (ms < 10) ms = '0' + '' + ms;
+    else if (ms < 100) ms = '00' + '' + ms;
+
     var event = {
         "PartitionKey": entGen.String(yyyy+""+mm+""+dd),
-        "RowKey": entGen.String(uuid()),
+        "RowKey": entGen.String(hh+mm+ss+ms+'_'+uuid()),
         "entity": entity,
         "action": action,
         "station_id": station_id || 0,
@@ -156,7 +169,7 @@ app.post('/customer/refill',function(req,res){
     
     var event = create_event('pump','purchase',req.body.station_id,req.body.pump_id,req.body.user_id,-1);
     insert(event,function(gas_received){
-        res.send(gas_received);
+        res.json(gas_received);
     }); 
 });
 
@@ -215,6 +228,9 @@ var process_stations = function(event){
 };
 
 var process_event = function(event,callback){
+    if(callback == undefined || callback == null){
+        callback = function(){};
+    }
     console.log(event['Timestamp']['_']);
     //return;
     ps.lock();

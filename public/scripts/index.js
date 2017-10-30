@@ -50,7 +50,8 @@
 				pump_id: pump_id,
 				user_id: socket.id
 			},function(resp){
-				
+				console.log(resp)
+				ractive.set('total_gas',ractive.get('total_gas')+resp)
 			},'json')
 		}
 
@@ -59,7 +60,7 @@
 				station_id: station_id,
 				pump_id: pump_id
 			},function(resp){
-				ractive.set('total_gas',ractive.get('total_gas')+resp)
+				
 			},'json')
 
 		}
