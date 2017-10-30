@@ -108,8 +108,8 @@ function create_event(entity ,action ,station_id ,pump_id ,user_id ,adjustment){
     var hh = today.getHours();
     if (hh < 10) hh = '0' + '' + hh;
 
-    var mm = today.getMinutes();
-    if (mm < 10) mm = '0' + '' + mm;
+    var mi = today.getMinutes();
+    if (mi < 10) mi = '0' + '' + mi;
 
     var ss = today.getSeconds();
     if (ss < 10) ss = '0' + '' + ss;
@@ -120,7 +120,7 @@ function create_event(entity ,action ,station_id ,pump_id ,user_id ,adjustment){
 
     var event = {
         "PartitionKey": entGen.String(yyyy+""+mm+""+dd),
-        "RowKey": entGen.String(hh+mm+ss+ms+'_'+uuid()),
+        "RowKey": entGen.String(yyyy+""+mm+""+dd+hh+mi+ss+ms+'_'+uuid()),
         "entity": entity,
         "action": action,
         "station_id": station_id || 0,
@@ -197,11 +197,18 @@ var update_clients = function(){
 //alter model to reflect ajustments from new logs
 var process_refill = function(event){
     //console.log(event['adjustment']['_']);
-    franchise.stations[event['station_id']['_']]['pumps'][event['pump_id']['_']]['capacity'] += event['adjustment']['_'];
+    if( franchise.stations[event['station_id']['_']] != null &&
+        franchise.stations[event['station_id']['_']]['pumps'] != null &&
+        franchise.stations[event['station_id']['_']]['pumps'][event['pump_id']['_']]){
+        franchise.stations[event['station_id']['_']]['pumps'][event['pump_id']['_']]['capacity'] += event['adjustment']['_'];
+    }
 }
 
 var process_purchase = function(event,callback){
-    if(franchise.stations[event['station_id']['_']]['pumps'][event['pump_id']['_']]['capacity'] >= -1*event['adjustment']['_']){
+    if( franchise.stations[event['station_id']['_']] != null &&
+        franchise.stations[event['station_id']['_']]['pumps'] != null &&
+        franchise.stations[event['station_id']['_']]['pumps'][event['pump_id']['_']] &&
+        franchise.stations[event['station_id']['_']]['pumps'][event['pump_id']['_']]['capacity'] >= -1*event['adjustment']['_']){
         franchise.stations[event['station_id']['_']]['pumps'][event['pump_id']['_']]['capacity'] += event['adjustment']['_'];
         callback(-1*event['adjustment']['_']);
     }else callback(0);
