@@ -55,8 +55,8 @@
 				pump_id: pump_id,
 				user_id: socket.id
 			},function(resp){
-				console.log(resp)
-				ractive.set('total_gas',ractive.get('total_gas')+resp)
+				ractive.set('total_gas',ractive.get('total_gas')+resp);
+				//ractive.update();
 			},'json')
 		}
 
@@ -82,26 +82,26 @@
 		//register events
 		ractive.on({
 			selectStationCustomer:function(event,context,station_index){
-					console.log(station_index);
-					ractive.set("selectedStationCustomer",station_index);
-					ractive.set("pumpsCustomer",franchise.stations[station_index]['pumps']);
-					ractive.update();
-				},
+				//console.log(station_index);
+				ractive.set("selectedStationCustomer",station_index);
+				ractive.set("pumpsCustomer",franchise.stations[station_index]['pumps']);
+				ractive.update();
+			},
 			selectStationStaff:function(event,context,station_index){
-				console.log(station_index);
+				//console.log(station_index);
 				ractive.set("selectedStationStaff",station_index);
 				ractive.set("pumpsStaff",franchise.stations[station_index]['pumps']);
 				ractive.update();
 			},
 			removeStation:function(event,context,station_index){
-				console.log(station_index);
+				//console.log(station_index);
 				remove_station(station_index);
 				ractive.set("selectedStationStaff",null);
 				ractive.set("pumpsStaff",{});
 				ractive.update();
 			},
 			addPump:function(event,context){
-				console.log(ractive.get('selectedStationStaff'));
+				//console.log(ractive.get('selectedStationStaff'));
 				add_pump(ractive.get('selectedStationStaff'));
 				ractive.update();
 			},
@@ -118,6 +118,7 @@
 				ractive.update();
 			},
 			refillCustomer:function(event,context,pump_id,station_id){
+				//console.log(event)
 				refill_customer(pump_id,station_id);
 				ractive.update();
 			},
@@ -133,14 +134,21 @@
 		
 		//refresh view when new data arrives
 		socket.on('update', function(msg){
-			//if(msg['last_update'] < franchise['last_updated']) return;
+			
 			franchise = msg;
 			ractive.set('franchise',franchise);
-			ractive.set('pumpsCustomer',{});
-			ractive.set('pumpsStaff',{});
+			
+			if(ractive.get('selectedStationCustomer') != null && franchise.stations[ractive.get('selectedStationCustomer')]!= null){
+				ractive.set("pumpsCustomer",franchise.stations[ractive.get('selectedStationCustomer')]['pumps']);
+			} else ractive.set('pumpsCustomer',{});
+
+			if(ractive.get('selectedStationStaff') != null && franchise.stations[ractive.get('selectedStationStaff')]!= null){
+				ractive.set("pumpsStaff",franchise.stations[ractive.get('selectedStationStaff')]['pumps']);
+			} else ractive.set('pumpsStaff',{});
+
+
 			ractive.update();
-			console.log('last updated:' + msg['last_updated']);
-			console.log(msg);
+
 
 		});
 	

@@ -182,8 +182,8 @@ app.post('/customer/refill',function(req,res){
     
     var event = create_event('pump','purchase',req.body.station_id,req.body.pump_id,req.body.user_id,-15);
     insert(event,function(gas_received){
-        res.json(gas_received);
         franchise.total_gas_sold+=gas_received;
+        res.json(gas_received);
         update_clients();
     }); 
 });
@@ -201,7 +201,7 @@ var process_refill = function(event){
 }
 
 var process_purchase = function(event,callback){
-    if(franchise.stations[event['station_id']['_']]['pumps'][event['pump_id']['_']]['capacity'] > -1*event['adjustment']['_']){
+    if(franchise.stations[event['station_id']['_']]['pumps'][event['pump_id']['_']]['capacity'] >= -1*event['adjustment']['_']){
         franchise.stations[event['station_id']['_']]['pumps'][event['pump_id']['_']]['capacity'] += event['adjustment']['_'];
         callback(-1*event['adjustment']['_']);
     }else callback(0);

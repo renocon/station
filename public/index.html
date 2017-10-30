@@ -13,7 +13,7 @@
 </head>
 <body>
 	<div class="container-fluid">
-		<div class=" text-center bg-success"><h3>Gas Station</h3></div>
+		<div class=" text-center bg-success"><h3>Gas Station Chain</h3></div>
 	<div id="target"></div>
 	<!--
 	<script id="template" type="text/ractive">
@@ -27,27 +27,38 @@
 				<div class="col-xs-12">Total Gas Consumed: {{total_gas}}</div>
 				<div class="col-xs-6">
 					<div>Stations</div>
+					<!--<form on-submit='submit'>-->
 					{{#each franchise.stations: id}}
+						
 						<div>
-							<button id='stationCustomer-{{id}}' on-click=['selectStationCustomer',@context,RowKey._] class='btn btn-default btn-sm'>
-								S {{pumps_count}}
-							</button>
+							<input id='stationCustomer-{{id}}' 
+								on-click=['selectStationCustomer',@context,RowKey._] 
+								class='btn btn-default btn-sm' 
+								name='stationsCustomersSelector'
+								type='radio'/>
+							S {{pumps_count}}
 						</div>
+							
+							
 					{{/each}}
+					<!--</form>-->
 				</div>
 				<div class="col-xs-6">
 					<div>Pumps</div>
+					<!--<form>-->
 					{{#each pumpsCustomer: id}}
 						<div>
-							<button id='pumpCustomer-{{id}}' on-click=['selectPumpCustomer',@context,RowKey._] class='btn btn-default btn-sm'>
-								P {{capacity}}
-							</button>
+
+							P {{capacity}}
+							
 							<button on-click=['refillCustomer',@context,RowKey._,station_id._] class='btn btn-default btn-sm'>
 								R
 							</button>
 
+
 						</div>
 					{{/each}}
+					<!--</form>-->
 				</div>
 
 			</div>
@@ -62,16 +73,21 @@
 							<span class='glyphicon glyphicon-plus'></span>
 						</button>
 					</div>
+					<!--<form>-->
 					{{#each franchise.stations: id}}
 						<div>
-							<button id='stationStaff-{{id}}' on-click=['selectStationStaff',@context,RowKey._] class='btn btn-default btn-sm'>
+							<input id='stationStaff-{{id}}' 
+								on-click=['selectStationStaff',@context,RowKey._] 
+								class='btn btn-default btn-sm'
+								name='stationsStaffSelector'
+								type='radio' />
 								S {{pumps_count}}
-							</button>
 							<button id='removeStationButton'  on-click=['removeStation',@context,RowKey._] class="btn btn-default btn-sm">
 								<span class='glyphicon glyphicon-trash'></span>
 							</button>
 						</div>
 					{{/each}}
+					<!--</form>-->
 				</div>
 				<div class="col-xs-6">
 					<div>
@@ -80,11 +96,11 @@
 							<span class='glyphicon glyphicon-plus'></span>
 						</button>		
 					</div>
+					<!--<form>-->
 					{{#each pumpsStaff: id}}
 						<div>
-							<button id='pumpStaff-{{id}}' on-click=['selectPumpStaff',@context,RowKey._] class='btn btn-default btn-sm'>
-								P {{capacity}}
-							</button>
+							
+							P {{capacity}}
 							<button on-click=['refillStaff',@context,RowKey._,station_id._] class='btn btn-default btn-sm'>
 								R
 							</button>
@@ -93,7 +109,7 @@
 							</button>
 						</div>
 					{{/each}}
-
+					<!--</form>-->
 				</div>
 
 			</div>
