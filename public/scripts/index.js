@@ -11,6 +11,7 @@
 		console.log('ready');
 		console.log(socket);
 
+		//add new station to circulation
 		var add_station = function(){
 			var input = {};
 			$.post('/station/add',input,function(resp){
@@ -18,6 +19,7 @@
 			},'json');
 		}
 
+		//remove station from functioning
 		var remove_station = function(station_id){
 			var input = {"station_id":station_id};
 			$.post('/station/remove',input,function(resp){
@@ -25,6 +27,7 @@
 			},'json');
 		}
 
+		//add pump to selected station
 		var add_pump = function(station_id){
 			var input = {
 				station_id: station_id
@@ -34,6 +37,7 @@
 			},'json');
 		}
 
+		//remove pump from operation
 		var remove_pump =  function(pump_id,station_id){
 			var input = {
 				"station_id":station_id,
@@ -44,6 +48,7 @@
 			},'json');
 		}
 
+		//customer comes and buys gas
 		var refill_customer = function(pump_id,station_id){
 			$.post('/customer/refill',{
 				station_id: station_id,
@@ -55,22 +60,26 @@
 			},'json')
 		}
 
+		//admin refill fuel in pumps
 		var refill_staff = function(pump_id,station_id){
 			$.post('/staff/refill',{
 				station_id: station_id,
 				pump_id: pump_id
 			},function(resp){
-				
+
 			},'json')
 
 		}
 
+		//initialize bind data to template
 		ractive = new Ractive({
 		  target: '#target',
 		  template: '#template',
 		  data: { franchise: franchise }
 		});
 		ractive.set('total_gas',0);
+
+		//register events
 		ractive.on({
 			selectStationCustomer:function(event,context,station_index){
 					console.log(station_index);
@@ -115,9 +124,14 @@
 			refillStaff:function(event,context,pump_id,station_id){
 				refill_staff(pump_id,station_id);
 				ractive.update();
+			},
+			addStation:function(event,context){
+				add_station();
+				ractive.update();
 			}
 	    });
 		
+		//refresh view when new data arrives
 		socket.on('update', function(msg){
 			//if(msg['last_update'] < franchise['last_updated']) return;
 			franchise = msg;
@@ -129,9 +143,6 @@
 			console.log(msg);
 
 		});
-
-
-		$('#addStationButton').click(add_station);
 	
 	});
 

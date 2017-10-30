@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Gas Station</title>
+	<title>Gas Station Chain</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<script type="text/javascript" src='jquery/jquery.min.js'></script>
 	<script type='text/javascript' src='/socket.io/socket.io.js'></script>
@@ -58,7 +58,7 @@
 				<div class="col-xs-6">
 					<div>
 						Stations 
-						<button id='addStationButton' class="btn btn-default btn-sm">
+						<button id='addStationButton' class="btn btn-default btn-sm" on-click=['addStation',@context]>
 							<span class='glyphicon glyphicon-plus'></span>
 						</button>
 					</div>

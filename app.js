@@ -28,6 +28,7 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: true
 })); 
 
+//get history to build model/materialized view
 var create_model = function(){
 
     var query = azure.TableQuery();
@@ -43,6 +44,8 @@ var create_model = function(){
 };
 //var tableService = azure.createTableService('comp69052017a212','a2ioIjW7X0rJH9PbZjRJeKlqg4H+RKWV3NScdjH/xp0FSRf4GLgAE0PPCodbmy8RCraAv63FzFkwb91emuchjQ==');
 var tableService = azure.createTableService('gsm','QKiizz0dnwyRvZcqsMMBRtm9vuuMDLvA2e3EE/aEZgigvd1/McMbicx59cqEaXZSN0lQ6PZg5TjOdkVBYbwTPw==');
+
+//ensure table for loggin events is present
 var create_env = function(){
     //log table
     tableService.createTableIfNotExists('events',function(error,result,response){
@@ -64,6 +67,7 @@ var entGen = azure.TableUtilities.entityGenerator;
 app.use(express.static('assets/bower_components'))
 app.use(express.static('public'));
 
+//place created logs in table
 var insert = function(event,callback){
     tableService.insertEntity('events',event,{echoContent: true},function(error,result,resp){
         //console.log(error);
@@ -74,6 +78,8 @@ var insert = function(event,callback){
         }
     }); 
 }
+
+//listeners for socket connections
 io.on('connection',function(socket){
     var event = create_event('users','add',null,null,socket.id,null);
     insert(event);   
@@ -85,6 +91,7 @@ io.on('connection',function(socket){
 
 });
 
+//transform request into suitable format for table storage
 function create_event(entity ,action ,station_id ,pump_id ,user_id ,adjustment){
     var today = new Date();
     var dd = today.getDate();
@@ -126,25 +133,28 @@ function create_event(entity ,action ,station_id ,pump_id ,user_id ,adjustment){
     return event;
 }
 
+//test
 app.get('/start',function(request,response){
     //console.log(request);
     
 });
 
-
+//add station
 app.post('/station/add',function(req,res){
     res.send('ok');
     var event = create_event('stations','add',null,null,null,null);
     insert(event); 
 });
 
+//remove station
 app.post('/station/remove',function(req,res){
     res.send('ok');
-    console.log('removing station '+req.body.station_id);
+    //console.log('removing station '+req.body.station_id);
     var event = create_event('stations','remove',req.body.station_id,null,null,null);
     insert(event); 
 });
 
+//add a pump to a selected station
 app.post('/pump/add',function(req,res){
     res.send('ok');
     var event = create_event('pumps','add',req.body.station_id,null,null,null);
@@ -153,33 +163,40 @@ app.post('/pump/add',function(req,res){
 
 });
 
+//remove selected pump from operation
 app.post('/pump/remove',function(req,res){
     var event = create_event('pumps','remove',req.body.station_id,req.body.pump_id,null,null);
     insert(event); 
     res.send(event['adjustment']['_']);
 });
 
+//add fuel to pump
 app.post('/staff/refill',function(req,res){
     res.send('ok');
     var event = create_event('pump','refill',req.body.station_id,req.body.pump_id,null,100);
     insert(event); 
 });
 
+//consume fuel from pump
 app.post('/customer/refill',function(req,res){
     
-    var event = create_event('pump','purchase',req.body.station_id,req.body.pump_id,req.body.user_id,-1);
+    var event = create_event('pump','purchase',req.body.station_id,req.body.pump_id,req.body.user_id,-15);
     insert(event,function(gas_received){
         res.json(gas_received);
+        franchise.total_gas_sold+=gas_received;
+        update_clients();
     }); 
 });
 
 
+//send updated model to connected clients
 var update_clients = function(){
     io.emit('update',franchise);
 }
 
+//alter model to reflect ajustments from new logs
 var process_refill = function(event){
-    console.log(event['adjustment']['_']);
+    //console.log(event['adjustment']['_']);
     franchise.stations[event['station_id']['_']]['pumps'][event['pump_id']['_']]['capacity'] += event['adjustment']['_'];
 }
 
@@ -256,6 +273,6 @@ var process_event = function(event,callback){
 }
 
 http.listen(3000, function(){
-  console.log('listening on *:3000');
+  console.log('listening on http://localhost:3000');
 });
 
