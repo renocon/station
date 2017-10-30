@@ -255,7 +255,7 @@ var process_event = function(event,callback){
     if(callback == undefined || callback == null){
         callback = function(){};
     }
-    console.log(event['Timestamp']['_']);
+    console.log(event['RowKey']['_']);
     //return;
     ps.lock();
     //console.log(msg);

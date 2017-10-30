@@ -102,6 +102,7 @@
 			},
 			addPump:function(event,context){
 				//console.log(ractive.get('selectedStationStaff'));
+				if(ractive.get('selectedStationStaff') == null) return;
 				add_pump(ractive.get('selectedStationStaff'));
 				ractive.update();
 			},
