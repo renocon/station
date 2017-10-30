@@ -2,7 +2,7 @@
   "name": "clouda2",
   "version": "0.0.0",
   "private": true,
-  "scripts": { "start": "node app.js"}
+  "scripts": { "start": "node app.js"},
   "dependencies": {
     "azure-storage": "^2.6.0",
     "body-parser": "^1.18.2",
